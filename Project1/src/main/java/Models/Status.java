@@ -2,6 +2,6 @@ package Models;
 
 public enum Status {
 	
-	pending, approved, denied;
+	Pending, Approved, Denied;
 
 }
