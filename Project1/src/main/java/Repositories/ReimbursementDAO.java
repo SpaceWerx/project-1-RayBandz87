@@ -174,4 +174,26 @@ public class ReimbursementDAO {
 		return null;
 	}
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public void update(Reimbursement unprocessedReimbursement) {
+		try (Connection connection = ConnectionFactoryUtility.getConnection()) {
+
+			String sql = "UPDATE ers_reimbursements SET resolver = ?, status = ?::status WHERE id = ?";
+
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+			preparedStatement.setInt(1, unprocessedReimbursement.getResolver());
+			preparedStatement.setObject(2, unprocessedReimbursement.getStatus().name());
+			preparedStatement.setInt(3, unprocessedReimbursement.getId());
+
+			preparedStatement.executeUpdate();
+
+			System.out.println("Reimbursement Successfully Updated!");
+
+		} catch (SQLException e) {
+			System.out.println("Updating Failed!");
+			e.printStackTrace();
+		}
+
+	}
 }
