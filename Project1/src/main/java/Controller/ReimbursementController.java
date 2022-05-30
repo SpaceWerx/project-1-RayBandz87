@@ -1,161 +1,57 @@
 package Controller;
 
-import javax.net.ssl.SSLEngineResult.Status;
+import java.util.List;
+
+import com.google.gson.Gson;
 
 import Models.Reimbursement;
-import io.javalin.http.Context;
-import io.javalin.http.HttpCode;
+import Models.Status;
+import Repositories.ReimbursementDAO;
+import Services.ReimbursementService;
+import io.javalin.http.Handler;
 
 public class ReimbursementController {
-	public void handleSubmit(Context ctx) {
-		try {
-			String input = ctx.body();
-			Reimbursement reimbursement = objectMapper.readValue(input, Reimbursement.class);
-			int id = reimbursementService.submitReimbursement(reimbursement);
+	ReimbursementDAO rd = new ReimbursementDAO();
+	ReimbursementService rs = new ReimbursementService();
 
-			if (id != 0) {
-				ctx.status(HttpCode.CREATED);
-				ctx.result("" + id);
-			} else {
-				ctx.status(HttpCode.BAD_REQUEST);
-				ctx.result("Reimbursement submission was unsuccessful.");
-			}
+	public Handler getReimbursementHandler = (ctx) -> {
+		List<Reimbursement> allReimbursements = rd.getAllReimbursements();
 
-		} catch (Exception e) {
-			ctx.status(HttpCode.INTERNAL_SERVER_ERROR);
-			if (!e.getMessage().isEmpty()) {
-				ctx.result(e.getMessage());
-			}
-			e.printStackTrace();
-		}
-	}
+		Gson gson = new Gson();
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void handleProcess(Context ctx) {
-		String authHeader = ctx.header("Current-User");
+		String JSONObject = gson.toJson(allReimbursements);
 
-		if (authHeader != null) {
-			int userId = Integer.parseInt(authHeader);
+		ctx.result(JSONObject);
+		ctx.status(200);
+	};
+	public Handler submitReimbursemetHandler = (ctx) -> {
+		String body = ctx.body();
 
-			try {
-				String reimbursementIdInput = ctx.pathParam("id");
-				int id = Integer.parseInt(reimbursementIdInput);
+		Gson gson = new Gson();
 
-				String statusInput = ctx.formParam("status");
-				Reimbursement reibursement = reimbursementService.getReimbursement(id);
-				if (reimbursement != null) {
-					Reimbursement processedReimbursement = reimbursementService.update(reimbursement, userId,
-							Status.valueOf(statusInput));
-					ctx.status(HttpCode.ACCEPTED);
-					ctx.json(processedReimbursement);
+		Reimbursement reimbursement = gson.fromJson(body, Reimbursement.class);
 
-				} else {
-					ctx.status(HttpCode.BAD_REQUEST);
-					ctx.result("Reimbursement processing was not successful");
+		rd.create(reimbursement);
 
-				}
-			} catch (Exception e) {
-				ctx.status(HttpCode.INTERNAL_SERVER_ERROR);
+		ctx.result("Reimbursement successfully added!");
+		ctx.status(201);
+	};
+	public Handler processHandler = (ctx) -> {
+		String body = ctx.body();
+		Gson gson = new Gson();
 
-				if (!e.getMessage().isEmpty()) {
-					ctx.result(e.getMessage());
-				}
-
-				e.printStackTrace();
-
-			}
-
+		Reimbursement reimbursement = gson.fromJson(body, Reimbursement.class);
+		int reimid = reimbursement.getId();
+		int id = reimbursement.getResolver();
+		Status statusInput = reimbursement.getStatus();
+		reimbursement = rd.getReimbursementsById(reimid);
+		Reimbursement processedReimbursement = rs.update(reimbursement, id, statusInput);
+		if (processedReimbursement != null) {
+			ctx.status(201);
+			ctx.result("Reimbursement was updated");
 		} else {
-			ctx.status(HttpCode.FORBIDDEN);
-			ctx.result("Missing Current User Header with ID");
+			ctx.status(400);
 		}
-	}
+	};
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void handleGetReimbursements(Context ctx) {
-		if (ctx.queryParam("author") != null) {
-			handleGetReimbursementsByAuthor(ctx);
-		} else if (ctx.queryParam("status") != null) {
-			handleGetReimbursementByStatus(ctx);
-		}
-	}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void handleGetReimbursementByStatus(Context ctx) {
-		try {
-			String statusParam = ctx.queryParam("status");
-			Status status = Status.valueOf(statusParam);
-
-			if (status == Status.Pending) {
-				ctx.status(HttpCode.OK);
-				ctx.json(reimbursementService.getPendingReimbursements());
-			} else {
-				ctx.status(HttpCode.OK);
-				ctx.json(reimbursementService.getResolvedReimbursements());
-			}
-		} catch (Exception e) {
-			ctx.status(HttpCode.INTERNAL_SERVER_ERROR);
-
-			if (!e.getMessage().isEmpty()) {
-				ctx.result(e.getMessage());
-			}
-			e.printStackTrace();
-		}
-	}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void handleGetReimbursementById(Context ctx) {
-
-		try {
-			String idParam = ctx.pathParam("id");
-			int id = Integer.parseInt(idParam);
-
-			Reimbursement reimbursement = reimbursementService.getReimbursementById(id);
-
-			if (reimbursement != null) {
-				ctx.status(HttpCode.OK);
-				ctx.json(reimbursement);
-			} else {
-				ctx.status(HttpCode.BAD_REQUEST);
-				ctx.result("Could not retrieve the reimbursement");
-			}
-		} catch (Exception e) {
-			ctx.status(HttpCode.INTERNAL_SERVER_ERROR);
-
-			if (!e.getMessage().isEmpty()) {
-				ctx.result(e.getMessage());
-			}
-
-			e.printStackTrace();
-		}
-	}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void handleGetReimbursementsByAuthor(Context ctx) {
-		try {
-			String idParam = ctx.queryParam("author");
-
-			if (idParam != null) {
-				int id = Integer.parseInt(idParam);
-				if (userService.checkUserExistsById(id)) {
-					ctx.status(HttpCode.OK);
-					ctx.json(reimbursementService.getReimbursementsByAuthor(id));
-				} else {
-					ctx.status(HttpCode.NOT_FOUND);
-					ctx.result("Unable to retrieve reimbursements, current user is not in the database");
-				}
-			} else {
-				ctx.status(HttpCode.BAD_REQUEST);
-				ctx.result("Missing Current User header");
-			}
-		} catch (Exception e) {
-			ctx.status(HttpCode.INTERNAL_SERVER_ERROR);
-
-			if (!e.getMessage().isEmpty()) {
-				ctx.result(e.getMessage());
-			}
-
-			e.printStackTrace();
-		}
-	}
 }

@@ -1,0 +1,70 @@
+html,
+body,
+header,
+#main {
+    height:auto;
+}
+.navbar{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: white;
+}
+#nav img {
+    max-height: 150px;
+    max-width: 150px;
+}
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+#bg img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    min-width: 50%;
+    min-height: 50%;
+}
+#display{
+    background-color: white;
+    color: black;
+    font-weight: bold;
+    border: 3px solid #f1f1f1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 50%;
+    padding: 20px;
+}
+#display-title {
+    padding: 25px;
+    text-align: center;
+}
+.form-container {
+    padding-left: 10%;
+    padding-right: 10%
+}
+.input-group {
+    padding-bottom: 10px;
+}
+#back-anchor {
+    text-decoration: none;
+    color: red;
+}
+#back-anchor:hover {
+    color: white;
+}
+#Logout-anchor {
+    text-decoration: none;
+    color: green;
+}
+#Logout-anchor:hover {
+    color: white;
+}

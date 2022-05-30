@@ -1,89 +1,126 @@
 package Models;
 
+import java.util.Objects;
+
 public class Reimbursement {
-	public int ID;
-    public int Author;
-    public ReimbursementType Type;
-    public Status Status;
-    public double Amount;
-    public int Resolver;
-    public String Description;
 
+	public int id;
+	public int author;
+	public int resolver;
+	public String description;
+	public ReimbursementType type;
+	public Status Status;
+	public double amount;
 
-public Reimbursement() {
-    super();
-}
+	public Reimbursement() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
+	public int getId() {
+		return id;
+	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public Reimbursement(int id, int author, int resolver, String description, ReimbursementType type, Status status, double amount) {
-        super();
-        this.ID = id;
-        Author = author;
-        Resolver = resolver;
-        Description = description;
-        this.Type = type;
-        this.Status = status;
-        Amount = amount;
-    }
+	public int getAuthor() {
+		return author;
+	}
 
-    public int getId() {
-        return ID;
-        // TODO Auto-generated method stub
-    }
+	public void setAuthor(int author) {
+		this.author = author;
+	}
 
-    public void setId(int id) {
-        this.ID = id;
-    }
+	public int getResolver() {
+		return resolver;
+	}
 
-    public int getAuthor() {
-        return Author;
-    }
+	public void setResolver(int resolver) {
+		this.resolver = resolver;
+	}
 
-    public void setAuthor(int author) {
-        Author = author;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public int getResolver() {
-        return Resolver;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setResolver(int resolver) {
-        Resolver = resolver;
-    }
+	public ReimbursementType getType() {
+		return type;
+	}
 
-    public void setDescription(String description) {
-        Description = description;
-    }
-    public String getDescription() {
-        return Description;
-    }
+	public Reimbursement(int author, String description, ReimbursementType type, Models.Status status, double amount) {
+		super();
+		this.author = author;
+		this.description = description;
+		this.type = type;
+		Status = status;
+		this.amount = amount;
+	}
 
-    public void setStatus(Status status) {
-        this.Status = status;
-    }
+	public Reimbursement(int id, int author, int resolver, String description, ReimbursementType type,
+			Models.Status status, double amount) {
+		super();
+		this.id = id;
+		this.author = author;
+		this.resolver = resolver;
+		this.description = description;
+		this.type = type;
+		Status = status;
+		this.amount = amount;
+	}
 
-    public Models.Status getStatus() {
-        return Status;
-    }
+	public Status getStatus() {
+		return Status;
+	}
 
-    public double getAmount() {
-        return Amount;
+	public void setStatus(Status status) {
+		Status = status;
+	}
 
-    }
+	public double getAmount() {
+		return amount;
+	}
 
-    public void setType(ReimbursementType type) {
-        this.Type = type;
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
 
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(Status, amount, author, description, id, resolver, type);
+	}
 
-    public ReimbursementType getType() {
-        return Type;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Reimbursement other = (Reimbursement) obj;
+		return Status == other.Status && Double.doubleToLongBits(amount) == Double.doubleToLongBits(other.amount)
+				&& author == other.author && Objects.equals(description, other.description) && id == other.id
+				&& resolver == other.resolver && Objects.equals(type, other.type);
+	}
 
-    public void setAmount(double d) {
-        Amount = d;
+	@Override
+	public String toString() {
+		return "Reimbursement [id=" + id + ", author=" + author + ", resolver=" + resolver + ", description="
+				+ description + ", type=" + type + ", Status=" + Status + ", amount=" + amount + ", getId()=" + getId()
+				+ ", getAuthor()=" + getAuthor() + ", getResolver()=" + getResolver() + ", getDescription()="
+				+ getDescription() + ", getType()=" + getType() + ", getStatus()=" + getStatus() + ", getAmount()="
+				+ getAmount() + ", hashCode()=" + hashCode() + ", getClass()=" + getClass() + ", toString()="
+				+ super.toString() + "]";
+	}
 
-    }	                                 
+	public void setType(ReimbursementType type) {
+		this.type = type;
+	}
 
 }

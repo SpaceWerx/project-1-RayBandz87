@@ -1,65 +1,44 @@
 package Services;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import Models.Role;
 import Models.User;
 import Repositories.UserDAO;
 
 public class UserService {
-	static UserDAO userDAO = new UserDAO();
+	UserDAO eDAO = new UserDAO(); // so that I can use the methods from the EmployeeDAO
 
-	public User getUserUsername(String username) {
-		return userDAO.getByUsername(username);
-	}
-//////////////////////////////////////////////////
+	public List<User> getEmployees() throws SQLException {
 
-	public List<User> getAllUsers() {
-		return userDAO.getAllUsers();
-	}
+		// get the List of Employees by calling the DAO method that selects them from
+		// the database
+		List<User> employees = eDAO.getEmployees();
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-	public void UserExistsById(int id) {
-		for (User user : userDAO.getAllUsers()) {
-			if (user.getId() == id) {
-				System.out.println("This ID exists");
-				break;
-			}
-		}
-		System.out.println("This ID does not exist");
+		// return the list of employees
+		return employees;
 	}
 
-//////////////////////////////////////////////
-	public List<User> getUserByRole(Role role) {
-		List<User> byRole = new ArrayList<>();
-		for (User user : userDAO.getAllUsers()) {
-			if (user.getRole() == role) {
-				byRole.add(user);
-			}
-		}
-
-		return byRole;
-	}
-
-/////////////////////////////////////////////////////////////////////////
-	public User getUserById(int id) {
-		return userDAO.getUserbyId(id);
-	}
-
-//////////////////////////////////////////////////////////////////////////
-	public void addUser(User newEmployee) throws SQLException {
+	public void addEmployee(User newEmployee) throws SQLException {
 
 		// take in the Employee object sent from the menu and send it to the EmployeeDAO
 		// to be inserted into the database
 
 		// call the DAO method that inserts the new Employee
-		userDAO.create(newEmployee);
+		eDAO.insertEmployee(newEmployee);
 	}
 
-	public boolean checkUserExistsById(int id) {
-		return false;
+	// This is only returning one object so it doesn't necessarily have to be a
+	// list...
+	public User getEmployeeById(int id) {
+
+		User employee = eDAO.getUserbyId(id);
+
+		return employee;
 	}
 
+	public List<User> getByRole(Models.Role role) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

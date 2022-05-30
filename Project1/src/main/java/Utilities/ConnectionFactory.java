@@ -1,13 +1,14 @@
-package Utilies;
+package Utilities;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionFactoryUtility {
-	private static ConnectionFactoryUtility instance;
+public class ConnectionFactory {
 
-	private ConnectionFactoryUtility() {
+	private static ConnectionFactory instance;
+
+	private ConnectionFactory() {
 		super();
 	}
 
@@ -22,9 +23,9 @@ public class ConnectionFactoryUtility {
 	 *
 	 * {@code ConnectionFactory.getInstance()}
 	 */
-	public static ConnectionFactoryUtility getInstance() {
+	public static ConnectionFactory getInstance() {
 		if (instance == null) {
-			instance = new ConnectionFactoryUtility();
+			instance = new ConnectionFactory();
 		}
 
 		return instance;
@@ -61,7 +62,7 @@ public class ConnectionFactoryUtility {
 		// environment variables
 
 		// the url to my database schema
-		String url = "jdbc:postgresql://project-1.cxqcci6bbzfb.us-east-2.rds.amazonaws.com:5432?currentSchema=p1schema";
+		String url = "jdbc:postgresql://project-1.cxqcci6bbzfb.us-east-2.rds.amazonaws.com:5432/postgres?currentSchema=project1";
 		// your postgres username (should just be postgres)
 		String username = "postgres";
 		// your postgres password (hopefully just "password")

@@ -10,68 +10,80 @@ import Models.User;
 import Repositories.ReimbursementDAO;
 
 public class ReimbursementService {
-
-	public ReimbursementDAO reimbursementDAO = new ReimbursementDAO();
-	public UserService rService = new UserService();
-	public static ArrayList<Reimbursement> reimbursements = new ArrayList<>();
-
-	public static void clearData() {
-		reimbursements.clear();
-	}
-
-	public void update(Reimbursement unprocessedReimbursement, int resolverId, Status updatedStatus) {
-
-		for (Reimbursement reimbursement : reimbursements) {
-			if (reimbursement.getId() == unprocessedReimbursement.getId()) {
-				reimbursement.setResolver(resolverId);
-				reimbursement.setStatus(updatedStatus);
-				return;
-			}
-		}
-		throw new RuntimeException("There was an error processing this reimbursement, please try again");
-	}
-
-	public int submitReimbursement(Reimbursement reimbursementToBeSubmitted) {
-
-		User employee = rService.getUserById(reimbursementToBeSubmitted.getAuthor());
-
-		if (employee.getRole() != Role.Employee) {
-
-			throw new IllegalArgumentException("Managers cannot submit reimbursement requests.");
-		} else {
-			reimbursementToBeSubmitted.setStatus(Status.Pending);
-
-			return reimbursementDAO.create(reimbursementToBeSubmitted);
-		}
-	}
-
-	public List<Reimbursement> getResolvedReimbursements() {
-
-		List<Reimbursement> resolvedReimbursements = new ArrayList<>();
-
-		resolvedReimbursements.addAll(reimbursementDAO.getByStatus(Status.Approved));
-		resolvedReimbursements.addAll(reimbursementDAO.getByStatus(Status.Denied));
-		return resolvedReimbursements;
-
-	}
-
-	public List<Reimbursement> getPendingReimbursements() {
-		return reimbursementDAO.getByStatus(Status.Pending);
-
-	}
+	ReimbursementDAO rd = new ReimbursementDAO();
+	UserService us = new UserService();
 
 	public Reimbursement getReimbursementById(int id) {
-		return ReimbursementDAO.getReimbursementById(id);
+		List<Reimbursement> reimbursements = new ArrayList<>();
+		for (Reimbursement reimbursement : reimbursements) {
+			if (reimbursement.getId() == id) {
+				return reimbursement;
+			}
+		}
+		return null;
 	}
 
 	public List<Reimbursement> getReimbursementsByAuthor(int userId) {
 
-		List<Reimbursement> userReimbursements = new ArrayList<>();
+		List<Reimbursement> userReimbursement = new ArrayList<>();
 
-		for (Reimbursement r : reimbursements) {
+		for (Reimbursement r : userReimbursement) {
 			if (r.getAuthor() == userId || r.getResolver() == userId) {
+				userReimbursement.add(r);
 			}
 		}
-		return userReimbursements;
+		return userReimbursement;
+
 	}
+
+	public List<Reimbursement> getPendingReimbursemts() {
+		List<Reimbursement> pendingReimbursements = new ArrayList<>();
+
+		for (Reimbursement reimbursement : pendingReimbursements) {
+			if (reimbursement.getStatus() == Status.Pending) {
+				pendingReimbursements.add(reimbursement);
+
+			}
+		}
+		return pendingReimbursements;
+	}
+
+	public List<Reimbursement> getResolvedReimbursements() {
+		List<Reimbursement> resolvedReimbursements = new ArrayList<>();
+
+		for (Reimbursement reimbursement : resolvedReimbursements) {
+			if (reimbursement.getStatus() == Status.Approved || reimbursement.getStatus() == Status.Denied) {
+				resolvedReimbursements.add(reimbursement);
+			}
+		}
+		return resolvedReimbursements;
+	}
+
+	public void submitReimbursement(Reimbursement reimbursementToBeSubmitted) {
+		List<Reimbursement> reimbursements = new ArrayList<>();
+		Reimbursement lastestReimbursement = reimbursements.get(reimbursements.size() - 1);
+		int id = lastestReimbursement.getId() + 1;
+
+		reimbursementToBeSubmitted.setId(id);
+		reimbursementToBeSubmitted.setStatus(Status.Pending);
+		reimbursements.add(reimbursementToBeSubmitted);
+	}
+
+	public Reimbursement update(Reimbursement reimbursement, int id, Status statusInput) {
+		User manager = us.getEmployeeById(id);
+
+		if (manager.getRole() != Role.Manager) {
+			throw new IllegalArgumentException("An Employee cannot process reimbursement requests.");
+		} else {
+
+			reimbursement.setResolver(id);
+			reimbursement.setStatus(statusInput);
+
+			rd.update(reimbursement);
+
+			return reimbursement;
+		}
+
+	}
+
 }
